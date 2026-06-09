@@ -84,7 +84,7 @@ function App() {
   console.log(isLoading)
   console.log(heatmapData)
 
-  if (isLoading) return <div>Chargement...</div>;
+  if (isLoading) return <div style={{ marginLeft: 50}} > Loading... </div> ;
 
   return (
     <>
