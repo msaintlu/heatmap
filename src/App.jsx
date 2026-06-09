@@ -87,26 +87,33 @@ function App() {
   if (isLoading) return <div style={{ marginLeft: 50}} > Loading... </div> ;
 
   return (
-    <>
-      <div>
-        <p
-          style={{
-            fontWeight: "bolder",
-            fontSize: 26,
-            marginLeft: 50,
-            marginTop: 50,
-            marginBottom: 20,
-          }}
-        >
-          Temperature heatmap
+  <>
+    <div
+      style={{
+        height: 70,
+        fontWeight: "bolder",
+        marginLeft: 50,
+        fontSize: 26,
+      }}
+    >
+      <p>
+        Temperature heatmap
         </p>
-        <ResponsiveHeatmap
-          data={heatmapData}
-          MARGIN={MARGIN}
-        />
-      </div>
-    </>
-  );
+    </div>
+    <div
+      style={{
+        height: 600,
+        backgroundColor: "lightgrey",
+        marginLeft: 50,
+      }}
+    >
+      <ResponsiveHeatmap
+        data={heatmapData}
+        MARGIN={MARGIN}
+      />
+    </div>
+  </>
+);
 }
 
 export default App
