@@ -1,4 +1,14 @@
 import { useState, useEffect } from "react";
+import { rollups, mean } from "d3-array";
+import { ResponsiveHeatmap } from "./vizcomponents/Heatmap";
+
+
+
+const MARGIN = { top: 50, right: 0, bottom: 70, left: 50 };
+
+
+const YEAR_START = new Date("2025-01-01");
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 // 20 cities, ordered from the far north to the far south.
 // Keeping them sorted by latitude is what makes the heatmap readable.
@@ -37,20 +47,44 @@ const url =
 console.log(url)
 
 function App() {
-  const [data, setData] = useState(null);
+  const [heatmapData, setHeatmapData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(url);
       const json = await response.json();
-      setData(json);
+
+      // 1. Flatten the array of cities into long daily rows.
+      //    Tag each row with its 7-day bucket index (0 = first week, 51 = last).
+      //    The Math.min folds Dec 31 into week 51 so we get exactly 52 columns.
+      const daily = json.flatMap((city, i) =>
+        city.daily.time.map((t, j) => ({
+          city: CITIES[i].name,
+          week: Math.min(51, Math.floor((new Date(t) - YEAR_START) / WEEK_MS)),
+          temp: city.daily.temperature_2m_mean[j],
+        }))
+      );
+
+      // 2. Average the daily temperatures per city and per week.
+      const dataForHeatmap = rollups(
+        daily,
+        (v) => mean(v, (d) => d.temp),
+        (d) => d.city,
+        (d) => d.week
+      ).flatMap(([city, weeks]) =>
+        weeks.map(([week, value]) => ({ city, week, value }))
+      ); // -> [{ city: 'Reykjavik', week: 0, value: -0.4 }, ...] : 20 x 52 cells
+
+      setHeatmapData(dataForHeatmap);
       setIsLoading(false);
-    };
+     };
     fetchData();
   }, []);
+  console.log(isLoading)
+  console.log(heatmapData)
 
-  console.log(data);
+  if (isLoading) return <div>Chargement...</div>;
 
   return (
     <>
@@ -66,6 +100,10 @@ function App() {
         >
           Temperature heatmap
         </p>
+        <ResponsiveHeatmap
+          data={heatmapData}
+          MARGIN={MARGIN}
+        />
       </div>
     </>
   );
