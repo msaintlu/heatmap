@@ -26,15 +26,17 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
   const allYGroups = useMemo(() => [...new Set(data.map((d) => d.city))], [data]);
   // List of unique items that will appear on the heatmap X axis
   const allXGroups = useMemo(() => [...new Set(data.map((d) => d.week))], [data]);
-  // Max absolute value, for colorbar
-  const maxAbsValue = Math.max(...data.map(d => Math.abs(d.value)));
+  // Max absolute value, for colorbar (if the heatmap was showing anomalies...)
+  {/*const maxAbsValue = Math.max(...data.map(d => Math.abs(d.value)));*/}
+  // Min and max of the value property, used to build the color scale
+  const [min, max] = useMemo(() => d3.extent(data.map((d) => d.value)), [data]);
  
   const xScale = useMemo(() => {
     return d3
       .scaleBand()
       .range([0, boundsWidth])
       .domain(allXGroups)
-      .padding(0.01);
+      .padding(0.);
   }, [data, width]);
 
   const yScale = useMemo(() => {
@@ -42,13 +44,15 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
       .scaleBand()
       .range([0, boundsHeight])
       .domain(allYGroups)
-      .padding(0.01);
+      .padding(0.);
   }, [data, height]);
 
-  const colorScale = d3
-    .scaleSequential()
-    .interpolator(d3.interpolateInferno)
-    .domain([-maxAbsValue, maxAbsValue]);
+  const colorScale = useMemo(() => {
+    return d3
+      .scaleSequential()
+      .interpolator(d3.interpolateRdYlBu)
+      .domain([max, min]);
+  }, [max, min]);
 
   const allRects = data.map((d, i) => {
     if (d.value === null) {
