@@ -70,15 +70,28 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
     );
   });
 
+  const yLabels = allYGroups.map((name, i) => {
+    const yPos = yScale(name);
+    return (
+      <text
+        key={i}
+        x={-5}
+        y={yPos + yScale.bandwidth() / 2}
+        textAnchor="end"
+        dominantBaseline="middle"
+        fontSize={14}
+      >
+        {name}
+      </text>
+    );
+  });
+
   return (
     <div>
       <svg width={width} height={height}>
-        <g
-          transform={
-            `translate( ${MARGIN.left}, ${MARGIN.top} )`
-          }
-        >
+        <g transform={`translate( ${MARGIN.left}, ${MARGIN.top} )`}>
           {allRects}
+          {yLabels}
         </g>
       </svg>
     </div>

@@ -4,7 +4,7 @@ import { ResponsiveHeatmap } from "./vizcomponents/Heatmap";
 
 
 
-const MARGIN = { top: 50, right: 0, bottom: 70, left: 50 };
+const MARGIN = { top: 50, right: 50, bottom: 70, left: 92 };
 
 
 const YEAR_START = new Date("2025-01-01");
@@ -107,6 +107,7 @@ function App() {
         height: 600,
         backgroundColor: "lightgrey",
         marginLeft: 50,
+        marginRight: 50,
       }}
     >
       <ResponsiveHeatmap
