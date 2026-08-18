@@ -113,7 +113,6 @@ function App() {
       className = "heatmap-container"
       style={{
         height: 600,
-        backgroundColor: "lightgrey",
         marginLeft: 50,
         marginRight: 50,
       }}

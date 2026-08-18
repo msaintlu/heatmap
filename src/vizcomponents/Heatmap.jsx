@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { useRef } from "react";
 import { useDimensions } from "./useDimensions";
 import {useMemo} from "react";
+import {ColorBar} from "./ColorBar";
 
 
 export const ResponsiveHeatmap = (props) => {
@@ -29,9 +30,12 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
   // Max absolute value, for colorbar (if the heatmap was showing anomalies...)
   {/*const maxAbsValue = Math.max(...data.map(d => Math.abs(d.value)));*/}
   // Min and max of the value property, used to build the color scale
-  const [min, max] = useMemo(() => d3.extent(data.map((d) => d.value)), [data]);
-  console.log(allXGroups)
- 
+  // non arrondis 
+  {/*const [min, max] = useMemo(() => d3.extent(data.map((d) => d.value)), [data]);*/}
+  // arrondis
+  const min = Math.floor(Math.min(...data.map((d) => d.value)));
+  const max = Math.ceil(Math.max(...data.map((d) => d.value)));
+
   const xScale = useMemo(() => {
     return d3
       .scaleBand()
@@ -140,6 +144,9 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
           {xLabels}
         </g>
       </svg>
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <ColorBar height={65} width={400} colorScale={colorScale}/>
+      </div>
     </div>
   );
 };
