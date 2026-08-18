@@ -110,6 +110,7 @@ function App() {
         </p>
     </div>
     <div
+      className = "heatmap-container"
       style={{
         height: 600,
         backgroundColor: "lightgrey",

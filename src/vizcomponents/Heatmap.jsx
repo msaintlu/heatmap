@@ -114,14 +114,14 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
 
     return monthLabels;
   }, [allXGroups, weekToMonth]);
-  
+
   const xLabels = xMonths.map((month, i) => {
     const xPos = xScale(allXGroups[i]);
     return (
       <text
         key={i}
         x={xPos + xScale.bandwidth() / 2}
-        y={boundsHeight + 20}
+        y={boundsHeight + 15}
         textAnchor="middle"
         dominantBaseline="middle"
         fontSize={14}

@@ -8,3 +8,7 @@
     font-variation-settings: "wdth" 100, "YTLC" 500;
   }
 }
+
+.heatmap-container{
+  min-width: 600px;
+}
