@@ -59,32 +59,39 @@ function App() {
       //    Tag each row with its 7-day bucket index (0 = first week, 51 = last).
       //    The Math.min folds Dec 31 into week 51 so we get exactly 52 columns.
       const daily = json.flatMap((city, i) =>
-        city.daily.time.map((t, j) => ({
-          city: CITIES[i].name,
-          week: Math.min(51, Math.floor((new Date(t) - YEAR_START) / WEEK_MS)),
-          temp: city.daily.temperature_2m_mean[j],
-        }))
+        city.daily.time.map((t, j) => {
+          const date = new Date(t);
+          const month = date.toLocaleString("en-US", { month: "short" }); 
+          return {
+            city: CITIES[i].name,
+            week: Math.min(51, Math.floor((date - YEAR_START) / WEEK_MS)),
+            temp: city.daily.temperature_2m_mean[j],
+            month: month, 
+          };
+        })
       );
 
       // 2. Average the daily temperatures per city and per week.
       const dataForHeatmap = rollups(
         daily,
-        (v) => mean(v, (d) => d.temp),
+        (v) => {
+          const meanTemp = mean(v, (d) => d.temp);
+          const month = v[0].month;
+          return { value: meanTemp, month: month };
+        },
         (d) => d.city,
         (d) => d.week
       ).flatMap(([city, weeks]) =>
-        weeks.map(([week, value]) => ({ city, week, value }))
-      ); // -> [{ city: 'Reykjavik', week: 0, value: -0.4 }, ...] : 20 x 52 cells
+        weeks.map(([week, { value, month }]) => ({ city, week, value, month }))
+      ); // -> [{ city: 'Reykjavik', week: 0, value: -0.4, month: "Jul" }, ...] : 20 x 52 cells
 
       setHeatmapData(dataForHeatmap);
       setIsLoading(false);
      };
     fetchData();
   }, []);
-  {/*
-  console.log(isLoading)
-  console.log(heatmapData)
-  */}
+  {/*console.log(isLoading)*/}
+  {/*console.log(heatmapData)*/}
 
   if (isLoading) return <div style={{ marginLeft: 50}} > Loading... </div> ;
 
@@ -99,7 +106,7 @@ function App() {
       }}
     >
       <p>
-        Temperature heatmap
+        Temperature heatmap 2025
         </p>
     </div>
     <div

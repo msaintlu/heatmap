@@ -30,6 +30,7 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
   {/*const maxAbsValue = Math.max(...data.map(d => Math.abs(d.value)));*/}
   // Min and max of the value property, used to build the color scale
   const [min, max] = useMemo(() => d3.extent(data.map((d) => d.value)), [data]);
+  console.log(allXGroups)
  
   const xScale = useMemo(() => {
     return d3
@@ -86,12 +87,57 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
     );
   });
 
+  // Associate months to weeks
+  const weekToMonth = useMemo(() => {
+    const mapping = {};
+    data.forEach((d) => {
+      if (!mapping[d.week]) {
+        mapping[d.week] = d.month; 
+      }
+    });
+    return mapping;
+  }, [data]);
+
+  const xMonths = useMemo(() => {
+    const monthLabels = [];
+    let lastMonth = null;
+
+    allXGroups.forEach((week) => {
+      const month = weekToMonth[week];
+      if (month !== lastMonth) {
+        monthLabels.push(month);
+        lastMonth = month;
+      } else {
+        monthLabels.push("");
+      }
+    });
+
+    return monthLabels;
+  }, [allXGroups, weekToMonth]);
+  
+  const xLabels = xMonths.map((month, i) => {
+    const xPos = xScale(allXGroups[i]);
+    return (
+      <text
+        key={i}
+        x={xPos + xScale.bandwidth() / 2}
+        y={boundsHeight + 20}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize={14}
+      >
+        {month}
+      </text>
+    );
+  });
+
   return (
     <div>
       <svg width={width} height={height}>
         <g transform={`translate( ${MARGIN.left}, ${MARGIN.top} )`}>
           {allRects}
           {yLabels}
+          {xLabels}
         </g>
       </svg>
     </div>
