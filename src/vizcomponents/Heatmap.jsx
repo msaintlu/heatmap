@@ -172,7 +172,12 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
         <Tooltip interactionData={interactionData} />
       </div>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-        <ColorBar height={65} width={400} colorScale={colorScale} />
+        <ColorBar 
+          height={65} 
+          width={400} 
+          colorScale={colorScale} 
+          interactionData={interactionData}/
+        >
       </div>
     </div>
   );

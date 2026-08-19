@@ -5,6 +5,7 @@ export const ColorBar = ({
   height,
   width,
   colorScale,
+  interactionData
 }) => {
   const COLOR_LEGEND_MARGIN = { top: 0, right: 0, bottom: 50, left: 0 };
   const boundsWidth = width - COLOR_LEGEND_MARGIN.right - COLOR_LEGEND_MARGIN.left;
@@ -15,6 +16,19 @@ export const ColorBar = ({
   const min = domain[domain.length - 1];
   const xScale = d3.scaleLinear().range([0, boundsWidth]).domain([min, max]);
   const canvasRef = { current: null };
+
+  const hoveredValue = interactionData?.value;
+  const x = hoveredValue ? xScale(hoveredValue) : null;
+  const triangleWidth = 9;
+  const triangleHeight = 6;
+  const triangle = x ? (
+    <polygon
+      points={`${x},0 ${x - triangleWidth / 2},${-triangleHeight} ${
+        x + triangleWidth / 2
+      },${-triangleHeight}`}
+      fill="grey"
+    />
+  ) : null;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -61,6 +75,7 @@ export const ColorBar = ({
           style={{ position: "absolute", top: 0, left: 0, overflow: "visible" }}
         >
           {allTicks}
+          {triangle}
         </svg>
       </div>
     </div>
