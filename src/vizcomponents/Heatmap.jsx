@@ -1,8 +1,8 @@
 import * as d3 from "d3";
-import { useRef } from "react";
+import { useRef, useState, useMemo } from "react";
 import { useDimensions } from "./useDimensions";
-import {useMemo} from "react";
-import {ColorBar} from "./ColorBar";
+import { ColorBar } from "./ColorBar";
+import { Tooltip } from "./Tooltip_heatmap";
 
 
 export const ResponsiveHeatmap = (props) => {
@@ -22,6 +22,8 @@ export const ResponsiveHeatmap = (props) => {
 const Heatmap = ({ width, height, data, MARGIN}) => {
   const boundsWidth = width - MARGIN.left - MARGIN.right;
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
+
+  const [interactionData, setInteractionData] = useState(null);
 
   // List of unique items that will appear on the heatmap Y axis
   const allYGroups = useMemo(() => [...new Set(data.map((d) => d.city))], [data]);
@@ -58,22 +60,6 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
       .interpolator(d3.interpolateRdYlBu)
       .domain([max, min]);
   }, [max, min]);
-
-  const allRects = data.map((d, i) => {
-    if (d.value === null) {
-      return;
-    }
-    return (
-      <rect
-        key={i}
-        x={xScale(d.week)}
-        y={yScale(d.city)}
-        width={xScale.bandwidth()}
-        height={yScale.bandwidth()}
-        fill={colorScale(d.value)}
-      />
-    );
-  });
 
   const yLabels = allYGroups.map((name, i) => {
     const yPos = yScale(name);
@@ -135,8 +121,36 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
     );
   });
 
+  const allRects = data.map((d, i) => {
+    if (d.value === null) {
+      return;
+    }
+    return (
+      <rect
+        key={i}
+        x={xScale(d.week)}
+        y={yScale(d.city)}
+        width={xScale.bandwidth()}
+        height={yScale.bandwidth()}
+        fill={colorScale(d.value)}
+        onMouseEnter={(e) => {
+          setInteractionData({
+            yValue: d.city,
+            xLabel: d.month,
+            xPos: xScale(d.week) + xScale.bandwidth(),
+            yPos: yScale(d.city) + yScale.bandwidth() / 2,
+            value: Math.round(d.value),
+            placement: xScale(d.week) < boundsWidth * 0.75 ? "right" : "left",
+            colorValue : colorScale(d.value),
+          });
+        }}
+        onMouseLeave={() => setInteractionData(null)}
+      />
+    );
+  });
+
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       <svg width={width} height={height}>
         <g transform={`translate( ${MARGIN.left}, ${MARGIN.top} )`}>
           {allRects}
@@ -144,8 +158,21 @@ const Heatmap = ({ width, height, data, MARGIN}) => {
           {xLabels}
         </g>
       </svg>
+      {/* Tooltip layer on top of the svg */}
+      <div
+        style={{
+          position: "absolute",
+          width: boundsWidth,
+          height: boundsHeight,
+          top: MARGIN.top,
+          left: MARGIN.left,
+          pointerEvents: "none",
+        }}
+      >
+        <Tooltip interactionData={interactionData} />
+      </div>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-        <ColorBar height={65} width={400} colorScale={colorScale}/>
+        <ColorBar height={65} width={400} colorScale={colorScale} />
       </div>
     </div>
   );

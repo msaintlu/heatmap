@@ -4,7 +4,7 @@ import { ResponsiveHeatmap } from "./vizcomponents/Heatmap";
 
 
 
-const MARGIN = { top: 50, right: 50, bottom: 70, left: 92 };
+const MARGIN = { top: 15, right: 50, bottom: 70, left: 92 };
 
 
 const YEAR_START = new Date("2025-01-01");
@@ -96,34 +96,30 @@ function App() {
   if (isLoading) return <div style={{ marginLeft: 50}} > Loading... </div> ;
 
   return (
-  <>
-    <div
-      style={{
-        height: 70,
-        fontWeight: "bolder",
-        marginLeft: 50,
-        fontSize: 26,
-      }}
-    >
-      <p>
-        Temperature heatmap 2025
+    <>
+      <div
+        style={{
+          height: 70,
+          marginLeft: 50,
+        }}
+      >
+        <p style={{ fontWeight: "bolder", fontSize: 26 }}>
+          Temperature heatmap 2025
         </p>
-    </div>
-    <div
-      className = "heatmap-container"
-      style={{
-        height: 600,
-        marginLeft: 50,
-        marginRight: 50,
-      }}
-    >
-      <ResponsiveHeatmap
-        data={heatmapData}
-        MARGIN={MARGIN}
-      />
-    </div>
-  </>
-);
+      </div>
+      <div
+        className="heatmap-container"
+        style={{
+          height: 600,
+          marginLeft: 50,
+          marginRight: 50,
+        }}
+      >
+        <ResponsiveHeatmap data={heatmapData} MARGIN={MARGIN} />
+      </div>
+      <p>Data from the Open-Meteo API</p>
+    </>
+  );
 }
 
 export default App
